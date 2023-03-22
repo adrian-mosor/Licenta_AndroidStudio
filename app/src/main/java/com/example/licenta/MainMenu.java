@@ -1,11 +1,7 @@
 package com.example.licenta;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,9 +20,14 @@ public class MainMenu extends AppCompatActivity {
     private final String apiKey3 = "1ZCLKDX2REMRH31O";
     private final String channelID3 = "2071205";
 
+    private final String apiKeyHeartbeat = "4F94OIT6QBHHTRRB";
+    private final String channelIDHeartBeat = "2074976";
+
     private TextView temperatureText;
     private TextView temperatureFText;
     private TextView humidityText;
+    private TextView testText;
+    private TextView statusText;
 
     private Timer mTimer;
     private Handler mHandler = new Handler();
@@ -36,15 +37,18 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);
 
+        statusText = findViewById(R.id.textView_esp_status);
+
         startTimer();
 
+        //passed to AsyncTask when retrieving data
         temperatureText = findViewById(R.id.textView_temperature);
         temperatureFText = findViewById(R.id.textView_temperatureF);
         humidityText = findViewById(R.id.textView_humidity);
-
     }
 
     private void startTimer() {
+
         mTimer = new Timer();
         mTimer.schedule(new TimerTask() {
             @Override
@@ -54,6 +58,8 @@ public class MainMenu extends AppCompatActivity {
                     public void run() {
                         retrieveDataThingSpeakTask task = new retrieveDataThingSpeakTask(MainMenu.this, temperatureText, temperatureFText, humidityText, channelID1, apiKey1, channelID2, apiKey2, channelID3, apiKey3);
                         task.execute();
+                        getHeartbeatTask task1 = new getHeartbeatTask(MainMenu.this, statusText, channelIDHeartBeat, apiKeyHeartbeat);
+                        task1.execute();
                     }
                 });
             }

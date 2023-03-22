@@ -25,10 +25,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
 
-                  Log.d("debugMode", "onClickConnectToMatrix");
-//                  connectToMatrixTask task = new connectToMatrixTask();
-//                  task.execute();
-
+                Log.d("debugMode", "onClickConnectToMatrix");
 
                 Intent intent = new Intent(MainActivity.this, MainMenu.class);
                 startActivity(intent);
