@@ -21,14 +21,7 @@ public class makeHttpRequest {
             writer.flush();
 
             int responseCode = conn.getResponseCode();
-//            System.out.println("Response Code : " + responseCode);
-            Log.d("debugMode", "Response Code : " + responseCode);
+            Log.d("debugModeHTTP", "Response Code : " + responseCode);
         }
 
-    public static void main(String[] args) throws IOException {
-
-        String url = "http://192.168.10.121:80/";
-        String message = "rgb_hi";
-        sendPostRequest(url, message);
-    }
 }

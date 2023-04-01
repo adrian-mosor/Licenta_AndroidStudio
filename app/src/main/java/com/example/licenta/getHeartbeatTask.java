@@ -60,7 +60,7 @@ public class getHeartbeatTask extends AsyncTask<Void, Void, Void> {
 
             Log.d("debugModeCH", "timestamp difference: " + secondsSinceLastHeartbeat);
 
-            if (secondsSinceLastHeartbeat > 20) {
+            if (secondsSinceLastHeartbeat > 18) {
                 isOnline = false; // The ESP8266 is offline
             }
         } catch (IOException | ParseException e) {

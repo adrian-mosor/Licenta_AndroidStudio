@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity{
 
                 Log.d("debugMode", "onClickConnectToMatrix");
 
+                connectToMatrixTask task = new connectToMatrixTask();
+                task.execute();
+
                 Intent intent = new Intent(MainActivity.this, MainMenu.class);
                 startActivity(intent);
             }
