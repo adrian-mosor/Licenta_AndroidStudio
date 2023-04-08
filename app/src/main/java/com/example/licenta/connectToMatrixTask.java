@@ -40,6 +40,7 @@ public class connectToMatrixTask extends AsyncTask<Void, Void, Void> {
                 e.printStackTrace();
             }
         } else {
+            //do nothing, it still goes into the layout of main menu
             Log.d("debugModeC", "connectToMatrixTask: IP address not found");
         }
 

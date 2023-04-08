@@ -1,13 +1,14 @@
 package com.example.licenta;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainMenu extends AppCompatActivity {
 
@@ -29,8 +30,7 @@ public class MainMenu extends AppCompatActivity {
     private TextView testText;
     private TextView statusText;
 
-    private Timer mTimer;
-    private Handler mHandler = new Handler();
+    private ScheduledExecutorService mExecutorService;
 
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -49,27 +49,23 @@ public class MainMenu extends AppCompatActivity {
 
     private void startTimer() {
 
-        mTimer = new Timer();
-        mTimer.schedule(new TimerTask() {
+        mExecutorService = Executors.newScheduledThreadPool(2);
+        mExecutorService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        retrieveDataThingSpeakTask task = new retrieveDataThingSpeakTask(MainMenu.this, temperatureText, temperatureFText, humidityText, channelID1, apiKey1, channelID2, apiKey2, channelID3, apiKey3);
-                        task.execute();
-                        getHeartbeatTask task1 = new getHeartbeatTask(MainMenu.this, statusText, channelIDHeartBeat, apiKeyHeartbeat);
-                        task1.execute();
-                    }
-                });
+
+                retrieveDataThingSpeakTask task = new retrieveDataThingSpeakTask(MainMenu.this, temperatureText, temperatureFText, humidityText, channelID1, apiKey1, channelID2, apiKey2, channelID3, apiKey3);
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+                getHeartbeatTask task1 = new getHeartbeatTask(MainMenu.this, statusText, channelIDHeartBeat, apiKeyHeartbeat);
+                task1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
-        }, 0, 1000);
+        }, 1, 2, TimeUnit.SECONDS);
 
     }
 
     private void stopTimer() {
-        mTimer.cancel();
-        mTimer.purge();
+        mExecutorService.shutdown();
     }
 
     protected void onDestroy() {

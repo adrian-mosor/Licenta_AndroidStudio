@@ -120,10 +120,10 @@ public class retrieveDataThingSpeakTask extends AsyncTask<Void, Void, Void>{
         // For example, show a toast message indicating that the connection was successful
 
         Log.d("debugModeR", "retrieveDataThingSpeak task: success async");
-//
-//        Log.d("debugModeR", "TemperatureC: " + temperatureField);
-//        Log.d("debugModeR", "TemperatureF: " + temperatureFField);
-//        Log.d("debugModeR", "Humidity: " + humidityField);
+
+        Log.d("debugModeR", "TemperatureC: " + temperatureField);
+        Log.d("debugModeR", "TemperatureF: " + temperatureFField);
+        Log.d("debugModeR", "Humidity: " + humidityField);
 
         mTemperatureText.setText(temperatureField);
         mTemperatureFText.setText(temperatureFField);

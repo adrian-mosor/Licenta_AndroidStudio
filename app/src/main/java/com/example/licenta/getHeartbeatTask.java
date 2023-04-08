@@ -29,6 +29,7 @@ public class getHeartbeatTask extends AsyncTask<Void, Void, Void> {
     private TextView mStatusText;
 
     public getHeartbeatTask(Context context, TextView statusText, String channelId, String apiKey) {
+
         mContext = context;
         mStatusText = statusText;
         url = "https://api.thingspeak.com/channels/" + channelId + "/feeds/last.json?api_key=" + apiKey;
@@ -37,6 +38,9 @@ public class getHeartbeatTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
+
+        Log.d("debugModeCH", "getHeartbeat task: do in background");
+
         OkHttpClient client1 = new OkHttpClient();
 
         Request request1 = new Request.Builder()
@@ -64,6 +68,8 @@ public class getHeartbeatTask extends AsyncTask<Void, Void, Void> {
                 isOnline = false; // The ESP8266 is offline
             }
         } catch (IOException | ParseException e) {
+
+            Log.d("debugMode", "getHeartbeat catch!");
             e.printStackTrace();
         }
 
@@ -74,6 +80,9 @@ public class getHeartbeatTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void result) {
+
+        Log.d("debugModeCH", "getHeartbeatTask task: success async");
+
         if (isOnline) {
             mStatusText.setText("status online");
         } else {
