@@ -32,10 +32,13 @@ public class MainMenu extends AppCompatActivity {
     private TextView temperatureFText;
     private TextView humidityText;
     private TextView statusText;
+    private TextView espError;
 
     private Button enrollButton;
 
     private ScheduledExecutorService mExecutorService;
+
+    boolean isESPOnline = false;    //package-private
 
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -44,6 +47,7 @@ public class MainMenu extends AppCompatActivity {
 
         statusText = findViewById(R.id.textView_esp_status);
         enrollButton = findViewById(R.id.button_enroll);
+        espError = findViewById(R.id.textview_error_esp);
 
         startTimer();
 
@@ -61,8 +65,16 @@ public class MainMenu extends AppCompatActivity {
                 connectToMatrixTask task = new connectToMatrixTask();
                 task.execute();
 
-                Intent intent = new Intent(MainMenu.this, SyncAccount.class);
-                startActivity(intent);
+                if(isESPOnline) {   //check the status of ESP for successfull syncing
+
+                    espError.setVisibility(View.GONE);  //in case it was showed and due to possible delays
+
+                    Intent intent = new Intent(MainMenu.this, SyncAccount.class);
+                    startActivity(intent);
+                }else{
+
+                    espError.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -80,7 +92,7 @@ public class MainMenu extends AppCompatActivity {
                 getHeartbeatTask task1 = new getHeartbeatTask(MainMenu.this, statusText, channelIDHeartBeat, apiKeyHeartbeat);
                 task1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
-        }, 1, 2, TimeUnit.SECONDS);
+        }, 2, 3, TimeUnit.SECONDS);
 
     }
 

@@ -22,7 +22,7 @@ import okhttp3.Response;
 public class getHeartbeatTask extends AsyncTask<Void, Void, Void> {
 
     private String url;
-    private Boolean isOnline = true;
+    private Boolean isOnline = false;
 
     public Context mContext;
 
@@ -85,8 +85,10 @@ public class getHeartbeatTask extends AsyncTask<Void, Void, Void> {
 
         if (isOnline) {
             mStatusText.setText("status online");
+            ((MainMenu) mContext).isESPOnline = true; // Update the isOnline variable in MainMenu
         } else {
             mStatusText.setText("status offline");
+            ((MainMenu) mContext).isESPOnline = false; // Update the isOnline variable in MainMenu
         }
     }
 }

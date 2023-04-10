@@ -80,28 +80,28 @@ public class SyncAccount extends AppCompatActivity {
                         Log.d("debugS:", ":" + StringUtils.isAllUpperCase(inputApiKey1) + StringUtils.isAllUpperCase(inputApiKey2) +
                                 StringUtils.isAllUpperCase(inputApiKey3));
 
+                        errorMessage.setText("Please add valid credentials!");
                         errorMessage.setVisibility(View.VISIBLE);
 
-                } else {
+                }
+                else {
                         errorMessage.setVisibility(View.GONE);  //in case it was showed eariler
                         successMessage.setVisibility(View.VISIBLE);
 
-                        //make sure ESP is online
+                        //make http request directly to ESP IP
 
-                        //make http request directly to its IP
+                        int delayMillis = 2000; // The delay in milliseconds (e.g., 2000 ms = 2 seconds)
+                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(SyncAccount.this, MainMenu.class);
+                                startActivity(intent);
+                            }
+                        }, delayMillis);
 
-
-                    int delayMillis = 2000; // The delay in milliseconds (e.g., 2000 ms = 2 seconds)
-                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent(SyncAccount.this, MainMenu.class);
-                            startActivity(intent);
-                        }
-                    }, delayMillis);
+                    }
                 }
-            }
-        });
+            });
     }
 
     public boolean isAllUpperCaseOrDigit(String input) {

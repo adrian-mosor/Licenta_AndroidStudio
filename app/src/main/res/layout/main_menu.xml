@@ -27,10 +27,10 @@
         android:text="Enroll"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.823"
+        app:layout_constraintHorizontal_bias="0.831"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textview_test"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.883" />
 
     <TextView
         android:id="@+id/textView_temperature"
@@ -83,6 +83,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.167" />
+
+    <TextView
+        android:id="@+id/textview_error_esp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please make sure ESP is online!"
+        android:textColor="#880808"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview_test"
+        app:layout_constraintVertical_bias="0.759" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
