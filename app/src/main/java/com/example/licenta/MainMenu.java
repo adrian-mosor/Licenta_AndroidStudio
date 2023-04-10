@@ -1,7 +1,11 @@
 package com.example.licenta;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,8 +31,9 @@ public class MainMenu extends AppCompatActivity {
     private TextView temperatureText;
     private TextView temperatureFText;
     private TextView humidityText;
-    private TextView testText;
     private TextView statusText;
+
+    private Button enrollButton;
 
     private ScheduledExecutorService mExecutorService;
 
@@ -38,6 +43,7 @@ public class MainMenu extends AppCompatActivity {
         setContentView(R.layout.main_menu);
 
         statusText = findViewById(R.id.textView_esp_status);
+        enrollButton = findViewById(R.id.button_enroll);
 
         startTimer();
 
@@ -45,6 +51,20 @@ public class MainMenu extends AppCompatActivity {
         temperatureText = findViewById(R.id.textView_temperature);
         temperatureFText = findViewById(R.id.textView_temperatureF);
         humidityText = findViewById(R.id.textView_humidity);
+
+        enrollButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d("debugModeM", "pushed button");
+
+                connectToMatrixTask task = new connectToMatrixTask();
+                task.execute();
+
+                Intent intent = new Intent(MainMenu.this, SyncAccount.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void startTimer() {
