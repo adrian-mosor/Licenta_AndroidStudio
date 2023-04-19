@@ -10,12 +10,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class SyncAccount extends AppCompatActivity {
+
+    private static final String DWEET_BASE_URL = "https://dweet.io/get/latest/dweet/for/";
 
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -89,6 +101,24 @@ public class SyncAccount extends AppCompatActivity {
                         successMessage.setVisibility(View.VISIBLE);
 
                         //make http request directly to ESP IP
+                        String esp8266_id = "smart_matrix_esp8266";
+                        String ipAddress = getIPAddressFromDweet(esp8266_id);
+
+                        if(ipAddress != null){
+                            String url = "http://" + ipAddress + ":80/";
+                            String message = "rgb_hi";
+
+                            makeHttpRequest h1 = new makeHttpRequest();
+                            try {
+                                h1.sendPostRequest(url, message);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }else{
+                            //put a message of warning
+
+                        }
 
                         int delayMillis = 2000; // The delay in milliseconds (e.g., 2000 ms = 2 seconds)
                         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -113,5 +143,35 @@ public class SyncAccount extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    private String getIPAddressFromDweet(String esp8266_id) {
+        String ipAddress = null;
+        String url = DWEET_BASE_URL + esp8266_id;
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();
+
+                try {
+                    JSONObject jsonObject = new JSONObject(responseBody);
+                    JSONArray jsonArray = jsonObject.getJSONArray("with");
+                    JSONObject latestDweet = jsonArray.getJSONObject(0);
+                    JSONObject content = latestDweet.getJSONObject("content");
+                    ipAddress = content.getString("ip");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return ipAddress;
     }
 }

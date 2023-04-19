@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,6 +29,8 @@ public class MainMenu extends AppCompatActivity {
     private final String apiKeyHeartbeat = "4F94OIT6QBHHTRRB";
     private final String channelIDHeartBeat = "2074976";
 
+    private SensorDataViewModel sensorDataViewModel;
+
     private TextView temperatureText;
     private TextView temperatureFText;
     private TextView humidityText;
@@ -44,6 +47,21 @@ public class MainMenu extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);
+
+        sensorDataViewModel = new ViewModelProvider(this).get(SensorDataViewModel.class);
+
+        // Observe LiveData changes
+        sensorDataViewModel.getTemperature().observe(this, value -> {
+            temperatureText.setText(value);
+        });
+
+        sensorDataViewModel.getTemperatureF().observe(this, value -> {
+            temperatureFText.setText(value);
+        });
+
+        sensorDataViewModel.getHumidity().observe(this, value -> {
+            humidityText.setText(value);
+        });
 
         statusText = findViewById(R.id.textView_esp_status);
         enrollButton = findViewById(R.id.button_enroll);
@@ -81,20 +99,21 @@ public class MainMenu extends AppCompatActivity {
 
     private void startTimer() {
 
-        mExecutorService = Executors.newScheduledThreadPool(2);
-        mExecutorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
+        mExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-                retrieveDataThingSpeakTask task = new retrieveDataThingSpeakTask(MainMenu.this, temperatureText, temperatureFText, humidityText, channelID1, apiKey1, channelID2, apiKey2, channelID3, apiKey3);
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-                getHeartbeatTask task1 = new getHeartbeatTask(MainMenu.this, statusText, channelIDHeartBeat, apiKeyHeartbeat);
-                task1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
+        // Schedule the RetrieveDataThingSpeakTask
+        mExecutorService.scheduleAtFixedRate(() -> {
+            retrieveDataThingSpeakTask task = new retrieveDataThingSpeakTask(MainMenu.this, channelID1, apiKey1, channelID2, apiKey2, channelID3, apiKey3);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }, 2, 3, TimeUnit.SECONDS);
 
+        // Schedule the GetHeartbeatTask
+        mExecutorService.scheduleAtFixedRate(() -> {
+            getHeartbeatTask task = new getHeartbeatTask(MainMenu.this, statusText, channelIDHeartBeat, apiKeyHeartbeat);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }, 2, 10, TimeUnit.SECONDS);
     }
+
 
     private void stopTimer() {
         mExecutorService.shutdown();

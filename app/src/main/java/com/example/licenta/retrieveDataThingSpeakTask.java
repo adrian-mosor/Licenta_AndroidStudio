@@ -15,7 +15,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+
 public class retrieveDataThingSpeakTask extends AsyncTask<Void, Void, Void>{
+
+    private SensorDataViewModel sensorDataViewModel;
 
     private String url1;
     private String temperatureField;
@@ -28,17 +34,12 @@ public class retrieveDataThingSpeakTask extends AsyncTask<Void, Void, Void>{
 
     public Context mContext;
 
-    private TextView mTemperatureText;
-    private TextView mTemperatureFText;
-    private TextView mHumidityText;
 
-
-    public retrieveDataThingSpeakTask(Context context, TextView temperatureText, TextView temperatureFText, TextView humidityText, String channelId1, String apiKey1, String channelId2, String apiKey2, String channelId3, String apiKey3) {
+    public retrieveDataThingSpeakTask(Context context, String channelId1, String apiKey1, String channelId2, String apiKey2, String channelId3, String apiKey3) {
 
         mContext = context;
-        mTemperatureText = temperatureText;
-        mTemperatureFText = temperatureFText;
-        mHumidityText = humidityText;
+
+        sensorDataViewModel = new ViewModelProvider((AppCompatActivity) context).get(SensorDataViewModel.class);
 
         this.url1 = "https://api.thingspeak.com/channels/" + channelId1 + "/fields/1.json?api_key=" + apiKey1 + "&results=1";
         this.url2 = "https://api.thingspeak.com/channels/" + channelId2 + "/fields/1.json?api_key=" + apiKey2 + "&results=1";
@@ -125,8 +126,8 @@ public class retrieveDataThingSpeakTask extends AsyncTask<Void, Void, Void>{
         Log.d("debugModeR", "TemperatureF: " + temperatureFField);
         Log.d("debugModeR", "Humidity: " + humidityField);
 
-        mTemperatureText.setText(temperatureField);
-        mTemperatureFText.setText(temperatureFField);
-        mHumidityText.setText(humidityField);
+        sensorDataViewModel.updateTemperature(temperatureField);
+        sensorDataViewModel.updateTemperatureF(temperatureFField);
+        sensorDataViewModel.updateHumidity(humidityField);
     }
 }
