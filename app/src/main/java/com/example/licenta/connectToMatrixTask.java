@@ -33,9 +33,8 @@ public class connectToMatrixTask extends AsyncTask<Void, Void, Void> {
             String url = "http://" + ipAddress + ":80/";
             String message = "rgb_hi";
 
-            makeHttpRequest h1 = new makeHttpRequest();
             try {
-                h1.sendPostRequest(url, message);
+                makeHttpRequest.sendPostRequest(url, message);
             } catch (IOException e) {
                 e.printStackTrace();
             }

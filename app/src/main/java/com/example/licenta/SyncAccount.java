@@ -106,11 +106,10 @@ public class SyncAccount extends AppCompatActivity {
 
                         if(ipAddress != null){
                             String url = "http://" + ipAddress + ":80/";
-                            String message = "rgb_hi";
+                            String message = "thingspeak_sync";
 
-                            makeHttpRequest h1 = new makeHttpRequest();
                             try {
-                                h1.sendPostRequest(url, message);
+                                makeHttpRequest.sendPostRequest(url, message);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
