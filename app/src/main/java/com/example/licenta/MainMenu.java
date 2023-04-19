@@ -17,16 +17,16 @@ import java.util.concurrent.TimeUnit;
 
 public class MainMenu extends AppCompatActivity {
 
-    private final String apiKey1 = "486R5S7M0349NF3V";
-    private final String channelID1 = "2039388";
+    private String apiKey1;
+    private String channelID1;
 
-    private final String apiKey2 = "NVON0G6E6POWKGRP";
-    private final String channelID2 = "2071204";
+    private String apiKey2;
+    private String channelID2;
 
-    private final String apiKey3 = "1ZCLKDX2REMRH31O";
-    private final String channelID3 = "2071205";
+    private String apiKey3;
+    private String channelID3;
 
-    private final String apiKeyHeartbeat = "4F94OIT6QBHHTRRB";
+    private final String apiKeyHeartbeat = "4F94OIT6QBHHTRRB";  //dedicated channel
     private final String channelIDHeartBeat = "2074976";
 
     private SensorDataViewModel sensorDataViewModel;
@@ -47,6 +47,24 @@ public class MainMenu extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);
+
+        SharedPreferencesHelper credentialStorage = new SharedPreferencesHelper(this);
+
+        channelID1 = credentialStorage.getChannelId1();
+        apiKey1 = credentialStorage.getApiKey1();
+
+        channelID2 = credentialStorage.getChannelId2();
+        apiKey2 = credentialStorage.getApiKey2();
+
+        channelID3 = credentialStorage.getChannelId3();
+        apiKey3 = credentialStorage.getApiKey3();
+
+        Log.d("debugStorage", "channelID1: " + channelID1);
+        Log.d("debugStorage", "channelID2: " + channelID2);
+        Log.d("debugStorage", "channelID3: " + channelID3);
+        Log.d("debugStorage", "APIKey1: " + apiKey1);
+        Log.d("debugStorage", "APIKey2: " + apiKey2);
+        Log.d("debugStorage", "APIKey3: " + apiKey3);
 
         sensorDataViewModel = new ViewModelProvider(this).get(SensorDataViewModel.class);
 

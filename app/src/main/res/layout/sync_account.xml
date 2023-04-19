@@ -188,7 +188,6 @@
         android:id="@+id/textview_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please add valid credentials!"
         android:textColor="#AE0840"
         android:textSize="16sp"
         android:textStyle="bold"

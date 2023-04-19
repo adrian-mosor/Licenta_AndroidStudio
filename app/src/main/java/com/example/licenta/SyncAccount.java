@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +34,8 @@ public class SyncAccount extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sync_account);
+
+        SharedPreferencesHelper credentialStorage = new SharedPreferencesHelper(this);
 
         Button syncButton = findViewById(R.id.button_sync);
 
@@ -84,41 +87,45 @@ public class SyncAccount extends AppCompatActivity {
 
 
                 if (inputApiKey1.length() != 16 || inputApiKey2.length() != 16 || inputApiKey3.length() != 16
-                    || inputChID1.length() != 7 || inputChID2.length() != 7 || inputChID3.length() != 7
-                    || !isAllUpperCaseOrDigit(inputApiKey1) || !isAllUpperCaseOrDigit(inputApiKey2) || !isAllUpperCaseOrDigit(inputApiKey3)
-                    ) {
-                        Log.d("debugS: ", ":" + inputApiKey1.length() + inputApiKey2.length() + inputApiKey3.length() + inputChID1.length() +
-                                inputChID2.length() + inputChID3.length());
-                        Log.d("debugS:", ":" + StringUtils.isAllUpperCase(inputApiKey1) + StringUtils.isAllUpperCase(inputApiKey2) +
-                                StringUtils.isAllUpperCase(inputApiKey3));
+                        || inputChID1.length() != 7 || inputChID2.length() != 7 || inputChID3.length() != 7
+                        || !isAllUpperCaseOrDigit(inputApiKey1) || !isAllUpperCaseOrDigit(inputApiKey2) || !isAllUpperCaseOrDigit(inputApiKey3)
+                ) {
+                    Log.d("debugS: ", ":" + inputApiKey1.length() + inputApiKey2.length() + inputApiKey3.length() + inputChID1.length() +
+                            inputChID2.length() + inputChID3.length());
+                    Log.d("debugS:", ":" + StringUtils.isAllUpperCase(inputApiKey1) + StringUtils.isAllUpperCase(inputApiKey2) +
+                            StringUtils.isAllUpperCase(inputApiKey3));
 
-                        errorMessage.setText("Please add valid credentials!");
-                        errorMessage.setVisibility(View.VISIBLE);
+                    errorMessage.setText("Please add valid credentials!");
+                    errorMessage.setVisibility(View.VISIBLE);
 
-                }
+                }   //beginning of success else
                 else {
-                        errorMessage.setVisibility(View.GONE);  //in case it was showed eariler
+                    errorMessage.setVisibility(View.GONE);  //in case it was showed eariler
+
+                    //make http request directly to ESP IP
+                    String esp8266_id = "smart_matrix_esp8266";
+                    String ipAddress = getIPAddressFromDweet(esp8266_id);
+
+                    if (ipAddress != null) {
+
+                        successMessage.setText("Successful Sync!");
                         successMessage.setVisibility(View.VISIBLE);
 
-                        //make http request directly to ESP IP
-                        String esp8266_id = "smart_matrix_esp8266";
-                        String ipAddress = getIPAddressFromDweet(esp8266_id);
+                        String url = "http://" + ipAddress + ":80/";
+                        String message = "thingspeak_sync";
 
-                        if(ipAddress != null){
-                            String url = "http://" + ipAddress + ":80/";
-                            String message = "thingspeak_sync";
-
-                            try {
-                                makeHttpRequest.sendPostRequest(url, message);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                        }else{
-                            //put a message of warning
-
+                        try {
+                            makeHttpRequest.sendPostRequest(url, message);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
 
+                    } else {  //in case we can't get the IP stored in dweet (this would be a rare failure)
+
+                        errorMessage.setText("There was a problem with the IP address reported by ESP! Please try a reboot.");
+                        errorMessage.setVisibility(View.VISIBLE);
+
+                        //delay of going back to MainMenu for the user to see the errorMessage
                         int delayMillis = 2000; // The delay in milliseconds (e.g., 2000 ms = 2 seconds)
                         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                             @Override
@@ -129,8 +136,10 @@ public class SyncAccount extends AppCompatActivity {
                         }, delayMillis);
 
                     }
-                }
-            });
+
+                }   //stop of success else
+            }
+        });
     }
 
     public boolean isAllUpperCaseOrDigit(String input) {
