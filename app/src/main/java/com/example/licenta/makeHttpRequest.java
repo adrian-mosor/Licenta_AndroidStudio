@@ -9,19 +9,31 @@ import java.net.URL;
 
 public class makeHttpRequest {
 
-        public static void sendPostRequest(String urlStr, String message) throws IOException {
-            URL url = new URL(urlStr);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "text/plain");
-            conn.setDoOutput(true);
+    private static boolean returnedStatus;
 
-            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-            writer.write(message);
-            writer.flush();
+    public static void sendPostRequest(String urlStr, String message) throws IOException {
+        URL url = new URL(urlStr);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "text/plain");
+        conn.setDoOutput(true);
 
-            int responseCode = conn.getResponseCode();
-            Log.d("debugModeHTTP", "Response Code : " + responseCode);
+        OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+        writer.write(message);
+        writer.flush();
+
+        int responseCode = conn.getResponseCode();
+        Log.d("debugModeHTTP", "Response Code : " + responseCode);
+
+        if(responseCode == 200 ){
+            returnedStatus = true;
+        }else{
+            returnedStatus = false;
         }
+    }
+
+    public static boolean getReturnedStatus(){
+        return returnedStatus;
+    }
 
 }

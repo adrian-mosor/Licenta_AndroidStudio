@@ -72,38 +72,54 @@ public class retrieveDataThingSpeakTask extends AsyncTask<Void, Void, Void>{
 
             //temperatureC
             Response response1 = client1.newCall(request1).execute();
-            String responseBody1 = response1.body().string();
 
-            JSONObject jsonObject1 = new JSONObject(responseBody1);
-            JSONArray feeds1 = jsonObject1.getJSONArray("feeds");
+            if(response1.isSuccessful()) {
+                String responseBody1 = response1.body().string();
 
-            if(feeds1.length() > 0 ){
-                JSONObject lastEntry1 = feeds1.getJSONObject(0);
-                temperatureField = lastEntry1.getString("field1");
+                JSONObject jsonObject1 = new JSONObject(responseBody1);
+                JSONArray feeds1 = jsonObject1.getJSONArray("feeds");
+
+                if (feeds1.length() > 0) {
+                    JSONObject lastEntry1 = feeds1.getJSONObject(0);
+                    temperatureField = lastEntry1.getString("field1");
+                }
+
+            }else{
+                temperatureField = "No-account";
             }
 
             //temperatureF
             Response response2 = client2.newCall(request2).execute();
-            String responseBody2 = response2.body().string();
 
-            JSONObject jsonObject2 = new JSONObject(responseBody2);
-            JSONArray feeds2 = jsonObject2.getJSONArray("feeds");
+            if(response2.isSuccessful()) {
+                String responseBody2 = response2.body().string();
 
-            if(feeds2.length() > 0 ){
-                JSONObject lastEntry2 = feeds2.getJSONObject(0);
-                temperatureFField = lastEntry2.getString("field1");
+                JSONObject jsonObject2 = new JSONObject(responseBody2);
+                JSONArray feeds2 = jsonObject2.getJSONArray("feeds");
+
+                if (feeds2.length() > 0) {
+                    JSONObject lastEntry2 = feeds2.getJSONObject(0);
+                    temperatureFField = lastEntry2.getString("field1");
+                }
+            }else{
+                temperatureFField = "No-account";
             }
 
             //Humidity
             Response response3 = client3.newCall(request3).execute();
-            String responseBody3 = response3.body().string();
 
-            JSONObject jsonObject3 = new JSONObject(responseBody3);
-            JSONArray feeds3 = jsonObject3.getJSONArray("feeds");
+            if(response3.isSuccessful()) {
+                String responseBody3 = response3.body().string();
 
-            if(feeds3.length() > 0 ){
-                JSONObject lastEntry3 = feeds3.getJSONObject(0);
-                humidityField = lastEntry3.getString("field1");
+                JSONObject jsonObject3 = new JSONObject(responseBody3);
+                JSONArray feeds3 = jsonObject3.getJSONArray("feeds");
+
+                if (feeds3.length() > 0) {
+                    JSONObject lastEntry3 = feeds3.getJSONObject(0);
+                    humidityField = lastEntry3.getString("field1");
+                }
+            }else{
+                humidityField = "No-account";
             }
 
         } catch (IOException | JSONException e) {

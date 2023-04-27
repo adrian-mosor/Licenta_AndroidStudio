@@ -3,7 +3,7 @@ package com.example.licenta;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class SharedPreferencesHelper {
+public class SharedPreferencesHelper {  //EEPROM-like for Android App
     private static final String PREFS_NAME = "MyPrefs";
     private static final String KEY_API_KEY_1 = "API_KEY_1";
     private static final String KEY_CHANNEL_ID_1 = "CHANNEL_ID_1";

@@ -1,5 +1,6 @@
 package com.example.licenta;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -22,8 +23,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
 
+import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class SyncAccount extends AppCompatActivity {
@@ -62,9 +66,26 @@ public class SyncAccount extends AppCompatActivity {
             }
         };
 
+        InputFilter channelIDFilter = new InputFilter() {
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                if (dstart == 0 && source.length() > 0 && source.charAt(start) == '0') {
+                    return "";
+                }
+                return null;
+            }
+        };
+
+
+        //alpha-numeric chars for API Keys
         apiKey1.setFilters(new InputFilter[]{apiKeyFilter, new InputFilter.LengthFilter(16)});
         apiKey2.setFilters(new InputFilter[]{apiKeyFilter, new InputFilter.LengthFilter(16)});
         apiKey3.setFilters(new InputFilter[]{apiKeyFilter, new InputFilter.LengthFilter(16)});
+
+        //stop channelIDs to start with zero (limitation of ESP method to store credentials)
+        chID1.setFilters(new InputFilter[]{channelIDFilter, new InputFilter.LengthFilter(7)});
+        chID2.setFilters(new InputFilter[]{channelIDFilter, new InputFilter.LengthFilter(7)});
+        chID3.setFilters(new InputFilter[]{channelIDFilter, new InputFilter.LengthFilter(7)});
 
         returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,33 +129,71 @@ public class SyncAccount extends AppCompatActivity {
 
                     if (ipAddress != null) {
 
-                        successMessage.setText("Successful Sync!");
-                        successMessage.setVisibility(View.VISIBLE);
+                        Log.d("debugESP", "entered IP NOT null if");
 
                         String url = "http://" + ipAddress + ":80/";
-                        String message = "thingspeak_sync";
+                        String message = "thingspeak_sync/" + inputChID1 + "/" + inputChID2 + "/" + inputChID3 + "/" + inputApiKey1 + "/" +
+                                inputApiKey2 + "/" + inputApiKey3;
+
+                        Log.d("debugESP", "url of IPAdress with port: " + url);
+                        Log.d("debugESP", "format message is " + message);
+
+                        credentialStorage.setApiKey1(inputApiKey1);
+                        credentialStorage.setApiKey2(inputApiKey2);
+                        credentialStorage.setApiKey3(inputApiKey3);
+
+                        credentialStorage.setChannelId1(inputChID1);
+                        credentialStorage.setChannelId2(inputChID2);
+                        credentialStorage.setChannelId3(inputChID3);
+
+                        final MediaType TEXT_PLAIN = MediaType.parse("text/plain; charset=utf-8");
+                        final boolean[] requestSuccessful = new boolean[1];
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                OkHttpClient client = new OkHttpClient();
+                                RequestBody requestBody = RequestBody.create(TEXT_PLAIN, message);
+                                Request request = new Request.Builder()
+                                        .url(url)
+                                        .post(requestBody)
+                                        .build();
+
+                                try {
+                                    Response response = client.newCall(request).execute();
+                                    requestSuccessful[0] = response.isSuccessful();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        thread.start();
 
                         try {
-                            makeHttpRequest.sendPostRequest(url, message);
-                        } catch (IOException e) {
+                            thread.join();
+                        } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+
+                        if (requestSuccessful[0]) {
+                            successMessage.setText("Successful Sync!");
+                            successMessage.setVisibility(View.VISIBLE);
+
+                            delayGoBackToMainMenu();
+
+                        } else {
+                            errorMessage.setText("The device ESP8266 is offline. Please check the connection and try again.");
+                            errorMessage.setVisibility(View.VISIBLE);
+                        }
+
+
 
                     } else {  //in case we can't get the IP stored in dweet (this would be a rare failure)
 
                         errorMessage.setText("There was a problem with the IP address reported by ESP! Please try a reboot.");
                         errorMessage.setVisibility(View.VISIBLE);
 
-                        //delay of going back to MainMenu for the user to see the errorMessage
-                        int delayMillis = 2000; // The delay in milliseconds (e.g., 2000 ms = 2 seconds)
-                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent intent = new Intent(SyncAccount.this, MainMenu.class);
-                                startActivity(intent);
-                            }
-                        }, delayMillis);
-
+                        delayGoBackToMainMenu();
                     }
 
                 }   //stop of success else
@@ -154,32 +213,59 @@ public class SyncAccount extends AppCompatActivity {
     }
 
     private String getIPAddressFromDweet(String esp8266_id) {
-        String ipAddress = null;
+        final String[] ipAddress = new String[1];
         String url = DWEET_BASE_URL + esp8266_id;
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
 
-        try {
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful()) {
-                String responseBody = response.body().string();
-
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
                 try {
-                    JSONObject jsonObject = new JSONObject(responseBody);
-                    JSONArray jsonArray = jsonObject.getJSONArray("with");
-                    JSONObject latestDweet = jsonArray.getJSONObject(0);
-                    JSONObject content = latestDweet.getJSONObject("content");
-                    ipAddress = content.getString("ip");
+                    Response response = client.newCall(request).execute();
+                    if (response.isSuccessful()) {
+                        String responseBody = response.body().string();
 
-                } catch (JSONException e) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(responseBody);
+                            JSONArray jsonArray = jsonObject.getJSONArray("with");
+                            JSONObject latestDweet = jsonArray.getJSONObject(0);
+                            JSONObject content = latestDweet.getJSONObject("content");
+                            ipAddress[0] = content.getString("ip");
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-        } catch (IOException e) {
+        });
+
+        thread.start();
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        return ipAddress;
+        return ipAddress[0];
+    }
+
+
+    public void delayGoBackToMainMenu(){
+
+        //delay of going back to MainMenu for the user to see the errorMessage
+        int delayMillis = 3400; // The delay in milliseconds (e.g., 2000 ms = 2 seconds)
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(SyncAccount.this, MainMenu.class);
+                startActivity(intent);
+            }
+        }, delayMillis);
     }
 }
