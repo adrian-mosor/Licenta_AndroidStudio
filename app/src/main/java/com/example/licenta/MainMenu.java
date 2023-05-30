@@ -38,7 +38,7 @@ public class MainMenu extends AppCompatActivity {
     private final String apiKeyHeartbeat = "B0HP8Y8MUQIWP3T6";  //dedicated channel
     private final String channelIDHeartBeat = "2123478";
 
-    private SensorDataViewModel sensorDataViewModel;
+    private SensorDataViewModel mSensorDataViewModel;
 
     private TextView temperatureText;
     private TextView temperatureFText;
@@ -74,18 +74,18 @@ public class MainMenu extends AppCompatActivity {
         Log.d("debugStorage", "APIKey2: " + apiKey2);
         Log.d("debugStorage", "APIKey3: " + apiKey3);
 
-        sensorDataViewModel = new ViewModelProvider(this).get(SensorDataViewModel.class);
+        mSensorDataViewModel = new ViewModelProvider(this).get(SensorDataViewModel.class);
 
         // Observe LiveData changes
-        sensorDataViewModel.getTemperature().observe(this, value -> {
+        mSensorDataViewModel.getTemperature().observe(this, value -> {
             temperatureText.setText(value);
         });
 
-        sensorDataViewModel.getTemperatureF().observe(this, value -> {
+        mSensorDataViewModel.getTemperatureF().observe(this, value -> {
             temperatureFText.setText(value);
         });
 
-        sensorDataViewModel.getHumidity().observe(this, value -> {
+        mSensorDataViewModel.getHumidity().observe(this, value -> {
             humidityText.setText(value);
         });
 

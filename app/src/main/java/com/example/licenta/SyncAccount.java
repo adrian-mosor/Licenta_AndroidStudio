@@ -201,7 +201,7 @@ public class SyncAccount extends AppCompatActivity {
         });
     }
 
-    public boolean isAllUpperCaseOrDigit(String input) {
+    private boolean isAllUpperCaseOrDigit(String input) {
         for (char c : input.toCharArray()) {
             if (Character.isLetter(c) && !Character.isUpperCase(c)) {
                 return false;
