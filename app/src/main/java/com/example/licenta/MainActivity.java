@@ -29,15 +29,6 @@ public class MainActivity extends AppCompatActivity{
 
                 Log.d("debugMode", "onClickConnectToMatrix");
 
-//                hardcoding credentials
-//                credentialStorage.setApiKey1("2EC6VJW7CNBAFMSK");
-//                credentialStorage.setApiKey2("K5VMZMJQWIG6M68X");
-//                credentialStorage.setApiKey3("G7J02CAXBRYS1YZL");
-//
-//                credentialStorage.setChannelId1("2123504");
-//                credentialStorage.setChannelId2("2123505");
-//                credentialStorage.setChannelId3("2123506");
-
                 connectToMatrixTask task = new connectToMatrixTask();
                 task.execute();
 
