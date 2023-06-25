@@ -29,6 +29,14 @@ public class MainActivity extends AppCompatActivity{
 
                 Log.d("debugMode", "onClickConnectToMatrix");
 
+                credentialStorage.setApiKey1("VSEWV1Q4Z2P6WVL2");
+                credentialStorage.setApiKey2("HAAELS3S8TSE9U70");
+                credentialStorage.setApiKey3("1UV47F50WM5HU7A7");
+
+                credentialStorage.setChannelId1("2125189");
+                credentialStorage.setChannelId2("2125190");
+                credentialStorage.setChannelId3("2125191");
+
                 connectToMatrixTask task = new connectToMatrixTask();
                 task.execute();
 
